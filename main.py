@@ -41,8 +41,9 @@ async def get_film_info(callback_query: types.CallbackQuery):
         url = games[callback_query.data]['link']
         price = games[callback_query.data]['price']
         size = games[callback_query.data]['size']
+        year = games[callback_query.data]['year']
         feedback = games[callback_query.data]['feedback']
-        message = f"<b>Посилання на магазин-сторінку гри: </b> {url}\n<b>Ціна: </b>{price}\n<b>Розмір гри: </b> {size}\n<b>Твій відгук: </b>{feedback}"
+        message = f"<b>Посилання на магазин-сторінку гри: </b> {url}\n<b>Ціна: </b>{price}\n<b>Розмір гри: </b> {size}\n<b>Рік виходу: </b>{year}\n<b>Твій відгук: </b>{feedback}"
         await bot.send_message(callback_query.message.chat.id, message, parse_mode='html')
     else:
         await bot.send_message(callback_query.message.chat.id, 'Гру не знайдено. Спробуй ще раз!')
@@ -92,8 +93,22 @@ async def set_size(message: types.Message, state: FSMContext):
     global game_name
     game_size = message.text
     games[game_name]['size'] = game_size
+    await state.set_state('set_year')
+    await message.answer(text='Чудово. Коли вийшла твоя гра?')
+@dp.message_handler(state='set_year')
+async def set_year(message: types.Message, state: FSMContext):
+    global game_name
+    game_year = message.text
+    games[game_name]['year'] = game_year
+    await state.set_state('set_feedback')
+    await message.answer(text='Чудово. Можеш написати відгук для цієї гри? Якщо ні, то просто напиши Відгуку немає')
+@dp.message_handler(state='set_feedback')
+async def set_feedback(message: types.Message, state: FSMContext):
+    global game_name
+    game_feedback = message.text
+    games[game_name]['feedback'] = game_feedback
     await state.set_state('set_photo')
-    await message.answer(text='Чудово. Дайте посилання на фото-баннер цієї гри')
+    await message.answer(text='Останній крок: дай посилання на фото-баннер гри')
 
 
 @dp.message_handler(state='set_photo')
@@ -133,8 +148,9 @@ async def watch_game(callback_query: types.CallbackQuery):
         url = games[callback_query.data]['link']
         price = games[callback_query.data]['price']
         size = games[callback_query.data]['size']
+        year = games[callback_query.data]['year']
         feedback = games[callback_query.data]['feedback']
-        message = f"<b>Посилання на магазин-сторінку гри: </b> {url}\n<b>Ціна: </b>{price}\n<b>Розмір гри: </b> {size}\n<b>Твій відгук: <b>{feedback}"
+        message = f"<b>Посилання на магазин-сторінку гри: </b> {url}\n<b>Ціна: </b>{price}\n<b>Розмір гри: </b> {size}\n<b>Рік виходу: </b>{year}\n<b>Твій відгук: </b>{feedback}"
         await bot.send_message(callback_query.message.chat.id, message, parse_mode='html')
 @dp.message_handler(commands='add_feedback')
 async def add_feedback(message: types.Message, state: FSMContext):
