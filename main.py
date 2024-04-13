@@ -50,7 +50,7 @@ async def get_film_info(callback_query: types.CallbackQuery):
 
 
 @dp.message_handler(commands='add_game')
-async def add_new_film(message: types.Message, state: FSMContext):
+async def add_game(message: types.Message, state: FSMContext):
     await state.set_state('set_game_name')
     await message.answer(text='Введіть назву гри, яку хочете додати до віш-ліста')
 
@@ -76,7 +76,7 @@ async def set_site_url(message: types.Message, state: FSMContext):
     game_url = message.text
     games[game_name]['link'] = game_url
     await state.set_state('set_price')
-    await message.answer(text='Чудово. Скільки коштує твоя гра?(бажано в долларах)\nЯкщо гра безкоштовна, напишіть Free')
+    await message.answer(text='Чудово. Скільки коштує твоя гра?(бажано в гривнях)\nЯкщо гра безкоштовна, напишіть Free')
 
 
 @dp.message_handler(state='set_price')
